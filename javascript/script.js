@@ -50,9 +50,9 @@ const loadCategory=async(id)=>{
 //       },
 //       "description": "Dive into the rhythm of 'Shape of You,' a captivating track that blends pop sensibilities with vibrant beats. Created by Olivia Mitchell, this song has already gained 100K views since its release. With its infectious melody and heartfelt lyrics, 'Shape of You' is perfect for fans looking for an uplifting musical experience. Let the music take over as Olivia's vocal prowess and unique style create a memorable listening journey."
 //     }
-const loadVideos = async()=>{
+const loadVideos = async(text='')=>{
      show("spiner")
-    const response = await fetch("https://openapi.programming-hero.com/api/phero-tube/videos");
+    const response = await fetch(`https://openapi.programming-hero.com/api/phero-tube/videos?title=${text}`);
     const data = await response.json();
     if(data.videos){
          displayVideos(data.videos);
@@ -99,7 +99,7 @@ const displayVideos =(videos)=>{
     </div>
   </div>
   <div class="text-center pb-3">
-   <button class="btn btn-wide hover:bg-red-600 hover:text-white">Details</button>
+   <button onclick="loadVideoDetails('${video.video_id}')" class="btn btn-wide hover:bg-red-600 hover:text-white">Details</button>
   </div>
 </div>
         `
@@ -108,6 +108,40 @@ const displayVideos =(videos)=>{
     
 }
 
+const loadVideoDetails =async(videoId)=>{
+    // console.log(videoId);
+    
+    const response = await fetch(`https://openapi.programming-hero.com/api/phero-tube/video/${videoId}`);
+    const data = await response.json();
+    // console.log(data.video);
+    
+    displayVideoDetails(data.video);
+    
+}
+const displayVideoDetails =(video)=>{
+    //  console.log(video);
+    document.getElementById("video_details").showModal();
+     
+     const videoDetails = document.getElementById("video-content");
+     
+     videoDetails.innerHTML=`
+        <img class="rounded-lg w-140" src="${video.thumbnail}" alt="">
+        <p class="py-4">${video.title}</p>
+        <p class="py-4">${video.description.slice(0,200)}</p>
+        <div class="flex justify-between items-center">
+            <p>Views:${video.others.views}</p>
+            <p>Posted Date:${video.others.posted_date}</p>
+        </div>
+        
+
+     `
+     
+}
+document.getElementById("search-input").addEventListener("keydown",(e)=>{
+ const title = e.target.value;
+ loadVideos(title);
+
+})
 const makeHide=(id)=>{
     document.getElementById(id).style.display="none";
 }
